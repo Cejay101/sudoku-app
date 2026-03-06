@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GameSession {
+  id         String       @id @default(cuid())
+  roomId     String       @unique
+  boardSize  Int
+  difficulty String
+  startedAt  DateTime     @default(now())
+  endedAt    DateTime?
+  results    GameResult[]
+}
+
+model GameResult {
+  id             String      @id @default(cuid())
+  session        GameSession @relation(fields: [sessionId], references: [id])
+  sessionId      String
+  playerName     String
+  completionTime Int?        // milliseconds, null if player never finished
+  rank           Int?
+  createdAt      DateTime    @default(now())
+}

@@ -4,6 +4,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const { PrismaClient } = require('@prisma/client');
 const { generatePuzzle } = require('./sudoku');
 const {
   createRoom,
@@ -16,27 +17,46 @@ const {
 } = require('./roomManager');
 
 const PORT = process.env.PORT || 3001;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
 
 const app = express();
 const server = http.createServer(app);
+const prisma = new PrismaClient();
 
 const io = new Server(server, {
   cors: {
-    origin: [CLIENT_ORIGIN, 'http://localhost:5173'],
+    origin: [CLIENT_ORIGIN, 'http://localhost:3000'],
     methods: ['GET', 'POST'],
   },
 });
 
-app.use(cors({ origin: [CLIENT_ORIGIN, 'http://localhost:5173'] }));
+app.use(cors({ origin: [CLIENT_ORIGIN, 'http://localhost:3000'] }));
 app.use(express.json());
 
-// Health check
+// ── Health check ─────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
 
-// Socket.io events
+// ── Recent game results ───────────────────────────────────────
+app.get('/api/results/recent', async (req, res) => {
+  try {
+    const sessions = await prisma.gameSession.findMany({
+      orderBy: { endedAt: 'desc' },
+      take: 20,
+      where: { endedAt: { not: null } },
+      include: {
+        results: { orderBy: { rank: 'asc' } },
+      },
+    });
+    res.json(sessions);
+  } catch (err) {
+    console.error('[api/results] error', err);
+    res.status(500).json({ error: 'Failed to fetch results' });
+  }
+});
+
+// ── Socket.io events ──────────────────────────────────────────
 io.on('connection', (socket) => {
   console.log(`[connect] ${socket.id}`);
 
@@ -85,7 +105,6 @@ io.on('connection', (socket) => {
         room: getPublicRoom(result.room),
       });
 
-      // Notify others
       socket.to(result.room.id).emit('room:updated', {
         room: getPublicRoom(result.room),
       });
@@ -106,24 +125,22 @@ io.on('connection', (socket) => {
   });
 
   // Start the game
-  socket.on('game:start', ({ roomId }) => {
+  socket.on('game:start', async ({ roomId }) => {
     try {
       const room = getRoom(roomId);
-      if (!room) {
-        socket.emit('room:error', { message: 'Room not found.' });
-        return;
-      }
-      if (room.hostId !== socket.id) {
-        socket.emit('room:error', { message: 'Only the host can start the game.' });
-        return;
-      }
-      if (room.players.length < 2) {
-        socket.emit('room:error', { message: 'Need at least 2 players to start.' });
-        return;
-      }
+      if (!room) { socket.emit('room:error', { message: 'Room not found.' }); return; }
+      if (room.hostId !== socket.id) { socket.emit('room:error', { message: 'Only the host can start the game.' }); return; }
+      if (room.players.length < 2) { socket.emit('room:error', { message: 'Need at least 2 players to start.' }); return; }
 
       const updatedRoom = startGame(roomId);
       const startTime = Date.now();
+
+      // Persist game session to database (non-blocking)
+      prisma.gameSession.upsert({
+        where: { roomId },
+        create: { roomId, boardSize: updatedRoom.boardSize, difficulty: updatedRoom.difficulty },
+        update: { startedAt: new Date() },
+      }).catch((dbErr) => console.error('[game:start] db error (non-fatal):', dbErr.message));
 
       io.to(roomId).emit('game:started', {
         puzzle: updatedRoom.puzzle,
@@ -140,7 +157,7 @@ io.on('connection', (socket) => {
   });
 
   // Player completed the puzzle
-  socket.on('game:complete', ({ roomId, time }) => {
+  socket.on('game:complete', async ({ roomId, time }) => {
     try {
       const result = playerCompleted(roomId, socket.id, time);
       if (!result) return;
@@ -154,6 +171,21 @@ io.on('connection', (socket) => {
       });
 
       if (allFinished) {
+        // Persist all results to database (non-blocking)
+        prisma.gameSession.findUnique({ where: { roomId } }).then(async (session) => {
+          if (!session) return;
+          await prisma.gameSession.update({ where: { roomId }, data: { endedAt: new Date() } });
+          await prisma.gameResult.createMany({
+            data: room.leaderboard.map((entry) => ({
+              sessionId: session.id,
+              playerName: entry.name,
+              completionTime: entry.time,
+              rank: entry.rank,
+            })),
+            skipDuplicates: true,
+          });
+        }).catch((dbErr) => console.error('[game:complete] db error (non-fatal):', dbErr.message));
+
         io.to(roomId).emit('game:over', {
           leaderboard: room.leaderboard,
           room: getPublicRoom(room),
