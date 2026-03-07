@@ -105,6 +105,24 @@ function playerCompleted(roomId, playerId, time) {
   return { room, allFinished };
 }
 
+function resetRoom(roomId, puzzle, solution) {
+  const room = rooms.get(roomId);
+  if (!room) return null;
+
+  room.status = 'waiting';
+  room.leaderboard = [];
+  room.puzzle = puzzle;
+  room.solution = solution;
+  room.startedAt = null;
+  room.players.forEach((p) => {
+    p.status = 'waiting';
+    p.completionTime = null;
+    p.rank = null;
+  });
+
+  return room;
+}
+
 function removePlayer(roomId, playerId) {
   const room = rooms.get(roomId);
   if (!room) return null;
@@ -149,6 +167,7 @@ module.exports = {
   joinRoom,
   startGame,
   playerCompleted,
+  resetRoom,
   removePlayer,
   getPublicRoom,
 };

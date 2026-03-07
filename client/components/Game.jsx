@@ -21,7 +21,9 @@ export default function Game({
   playerId,
   players,
   onHome,
+  onReturnToLobby,
   serverStartTime,
+  isHost,
 }) {
   const [board, setBoard] = useState(() => puzzle.map((row) => [...row]));
   const [selectedCell, setSelectedCell] = useState(null);
@@ -270,14 +272,20 @@ export default function Game({
           >
             <h2 className="font-board text-[2rem] font-semibold text-app-text text-center">Game Over!</h2>
             <Leaderboard leaderboard={leaderboard} players={roomPlayers} currentPlayerId={playerId} />
-            <div className="flex justify-center mt-2">
-              <motion.button
-                className="px-5 py-2.5 rounded-app-sm bg-app-accent text-white font-semibold text-[0.9rem] border-2 border-app-accent hover:bg-app-accent-hover transition-colors"
-                onClick={onHome}
-                whileTap={{ scale: 0.97 }}
-              >
-                Back to Home
-              </motion.button>
+            <div className="flex justify-center gap-3 mt-2">
+              {isHost ? (
+                <motion.button
+                  className="px-5 py-2.5 rounded-app-sm bg-app-accent text-white font-semibold text-[0.9rem] border-2 border-app-accent hover:bg-app-accent-hover transition-colors"
+                  onClick={onReturnToLobby}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Back to Lobby
+                </motion.button>
+              ) : (
+                <p className="text-sm text-app-secondary italic">
+                  Waiting for host to return to lobby...
+                </p>
+              )}
             </div>
           </motion.div>
         </motion.div>

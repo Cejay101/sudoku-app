@@ -97,6 +97,25 @@ function AppContent() {
     socket.emit('game:start', { roomId: room.id });
   }
 
+  function handleReturnToLobby() {
+    if (!room || !socket) return;
+    socket.emit('room:returnToLobby', { roomId: room.id });
+  }
+
+  // Listen for returnToLobby while in game-multi screen
+  useEffect(() => {
+    if (screen !== 'game-multi' || !socket) return;
+
+    function onReturnedToLobby({ room: r }) {
+      setRoom(r);
+      setGameData(null);
+      setScreen('lobby');
+    }
+
+    socket.on('room:returnedToLobby', onReturnedToLobby);
+    return () => { socket.off('room:returnedToLobby', onReturnedToLobby); };
+  }, [screen, socket]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Listen for lobby events while in lobby screen
   useEffect(() => {
     if (screen !== 'lobby' || !socket) return;

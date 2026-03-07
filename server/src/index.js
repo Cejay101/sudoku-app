@@ -12,6 +12,7 @@ const {
   joinRoom,
   startGame,
   playerCompleted,
+  resetRoom,
   removePlayer,
   getPublicRoom,
 } = require('./roomManager');
@@ -193,6 +194,25 @@ io.on('connection', (socket) => {
       }
     } catch (err) {
       console.error('[game:complete] error', err);
+    }
+  });
+
+  // Return all players to lobby after game over
+  socket.on('room:returnToLobby', ({ roomId }) => {
+    try {
+      const room = getRoom(roomId);
+      if (!room) { socket.emit('room:error', { message: 'Room not found.' }); return; }
+      if (room.hostId !== socket.id) { socket.emit('room:error', { message: 'Only the host can return to lobby.' }); return; }
+
+      const { puzzle, solution } = generatePuzzle(room.boardSize, room.difficulty);
+      const updatedRoom = resetRoom(roomId, puzzle, solution);
+
+      io.to(roomId).emit('room:returnedToLobby', {
+        room: getPublicRoom(updatedRoom),
+      });
+    } catch (err) {
+      console.error('[room:returnToLobby] error', err);
+      socket.emit('room:error', { message: 'Failed to return to lobby.' });
     }
   });
 
