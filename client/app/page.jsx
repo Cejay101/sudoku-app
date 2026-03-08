@@ -214,7 +214,9 @@ function AppContent() {
             playerId={playerInfo.id}
             players={room?.players || []}
             onHome={goHome}
+            onReturnToLobby={handleReturnToLobby}
             serverStartTime={gameData.startTime}
+            isHost={room?.hostId === playerInfo.id}
           />
         </motion.div>
       )}
