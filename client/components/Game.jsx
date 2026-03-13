@@ -8,6 +8,7 @@ import Timer from './Timer';
 import PowerUps from './PowerUps';
 import Leaderboard from './Leaderboard';
 import CompletionModal from './CompletionModal';
+import ThemeToggle from './ThemeToggle';
 import { useTimer } from '@/hooks/useTimer';
 
 export default function Game({
@@ -199,7 +200,10 @@ export default function Game({
           </span>
         </div>
 
-        <Timer elapsed={elapsed} running={running} />
+        <div className="flex items-center gap-2">
+          <Timer elapsed={elapsed} running={running} />
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Main body */}

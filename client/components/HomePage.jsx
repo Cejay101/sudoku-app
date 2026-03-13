@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import ThemeToggle from './ThemeToggle';
 
 const LOGO_PATTERN = [5,3,0, 6,0,0, 0,9,8, 0,7,0, 1,9,5, 0,0,0, 0,0,0, 0,0,0, 0,6,0];
 
@@ -16,7 +17,10 @@ const cardVariants = {
 
 export default function HomePage({ onSinglePlayer, onMultiplayer }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-10 px-6 py-8 bg-app-bg">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-10 px-6 py-8 bg-app-bg relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       {/* Hero */}
       <motion.div
         className="flex flex-col items-center gap-3 text-center"

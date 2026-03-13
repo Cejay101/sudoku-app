@@ -11,10 +11,75 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Board cell borders are computed per-cell so we use CSS variables here */
+/* ── Theme variables ─────────────────────────────────────── */
 :root {
+  --app-bg: #f5f3ee;
+  --app-surface: #ffffff;
+  --app-raised: #fafaf8;
+
+  --app-border: #e2dfd8;
+  --app-border-light: #c8c4bc;
+  --app-border-bold: #2a2a2a;
   --border-bold: #2a2a2a;
   --border-light: #e04e4e;
+
+  --app-text: #1a1a1a;
+  --app-secondary: #666666;
+  --app-muted: #999999;
+
+  --app-accent: #4f46e5;
+  --app-accent-hover: #4338ca;
+  --app-accent-light: #eef2ff;
+  --app-accent-border: #c7d2fe;
+
+  --app-success: #16a34a;
+  --app-success-light: #dcfce7;
+  --app-error: #dc2626;
+  --app-error-light: #fee2e2;
+  --app-warning: #d97706;
+
+  --cell-highlight: #e8f0fe;
+  --cell-same: #fef9c3;
+  --cell-revealed: #dcfce7;
+  --cell-error-bg: #fee2e2;
+
+  --shadow-app: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-app-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.dark {
+  --app-bg: #121212;
+  --app-surface: #1e1e1e;
+  --app-raised: #252525;
+
+  --app-border: #333333;
+  --app-border-light: #444444;
+  --app-border-bold: #e0e0e0;
+  --border-bold: #e0e0e0;
+  --border-light: #e04e4e;
+
+  --app-text: #e8e8e8;
+  --app-secondary: #a0a0a0;
+  --app-muted: #707070;
+
+  --app-accent: #818cf8;
+  --app-accent-hover: #6366f1;
+  --app-accent-light: #1e1b4b;
+  --app-accent-border: #3730a3;
+
+  --app-success: #22c55e;
+  --app-success-light: #14532d;
+  --app-error: #f87171;
+  --app-error-light: #450a0a;
+  --app-warning: #fbbf24;
+
+  --cell-highlight: #1e293b;
+  --cell-same: #422006;
+  --cell-revealed: #14532d;
+  --cell-error-bg: #450a0a;
+
+  --shadow-app: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-app-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 /* Sudoku board grid dynamic columns */

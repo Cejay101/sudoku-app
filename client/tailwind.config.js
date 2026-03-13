@@ -9,45 +9,45 @@ module.exports = {
     extend: {
       colors: {
         // App background & surfaces
-        'app-bg':      '#f5f3ee',
-        'app-surface': '#ffffff',
-        'app-raised':  '#fafaf8',
+        'app-bg':      'var(--app-bg)',
+        'app-surface': 'var(--app-surface)',
+        'app-raised':  'var(--app-raised)',
 
         // Borders
-        'app-border':       '#e2dfd8',
-        'app-border-light': '#c8c4bc',
-        'app-border-bold':  '#2a2a2a',
+        'app-border':       'var(--app-border)',
+        'app-border-light': 'var(--app-border-light)',
+        'app-border-bold':  'var(--app-border-bold)',
 
         // Text
-        'app-text':      '#1a1a1a',
-        'app-secondary': '#666666',
-        'app-muted':     '#999999',
+        'app-text':      'var(--app-text)',
+        'app-secondary': 'var(--app-secondary)',
+        'app-muted':     'var(--app-muted)',
 
         // Accent (indigo)
-        'app-accent':        '#4f46e5',
-        'app-accent-hover':  '#4338ca',
-        'app-accent-light':  '#eef2ff',
-        'app-accent-border': '#c7d2fe',
+        'app-accent':        'var(--app-accent)',
+        'app-accent-hover':  'var(--app-accent-hover)',
+        'app-accent-light':  'var(--app-accent-light)',
+        'app-accent-border': 'var(--app-accent-border)',
 
         // Status
-        'app-success':       '#16a34a',
-        'app-success-light': '#dcfce7',
-        'app-error':         '#dc2626',
-        'app-error-light':   '#fee2e2',
-        'app-warning':       '#d97706',
+        'app-success':       'var(--app-success)',
+        'app-success-light': 'var(--app-success-light)',
+        'app-error':         'var(--app-error)',
+        'app-error-light':   'var(--app-error-light)',
+        'app-warning':       'var(--app-warning)',
 
         // Sudoku board cells
-        'cell-highlight': '#e8f0fe',
-        'cell-same':      '#fef9c3',
-        'cell-revealed':  '#dcfce7',
-        'cell-error-bg':  '#fee2e2',
+        'cell-highlight': 'var(--cell-highlight)',
+        'cell-same':      'var(--cell-same)',
+        'cell-revealed':  'var(--cell-revealed)',
+        'cell-error-bg':  'var(--cell-error-bg)',
       },
       fontFamily: {
         board: ['"Crimson Pro"', 'Georgia', 'serif'],
       },
       boxShadow: {
-        app:    '0 2px 8px rgba(0, 0, 0, 0.08)',
-        'app-lg': '0 8px 32px rgba(0, 0, 0, 0.12)',
+        app:    'var(--shadow-app)',
+        'app-lg': 'var(--shadow-app-lg)',
       },
       borderRadius: {
         app:    '10px',
